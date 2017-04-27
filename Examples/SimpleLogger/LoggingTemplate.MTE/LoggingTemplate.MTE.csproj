@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MTE.Core\MTE.Core.csproj" />
+    <ProjectReference Include="..\..\..\MTE.CSharp\MTE.CSharp.csproj" />
+  </ItemGroup>
+
+</Project>

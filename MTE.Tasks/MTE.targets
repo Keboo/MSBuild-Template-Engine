@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+  <PropertyGroup>
+    <EnableDefaultCompileItems>False</EnableDefaultCompileItems>
+    <MteRoot />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="*.cs" Exclude="*.g.cs" />
+    <Compile Include="*.g.cs">
+      <DependentUpon>$([System.String]::Copy('%(Compile.Filename)').Replace('.g', '')).cs</DependentUpon>
+      <IsGenerated>True</IsGenerated>
+    </Compile>
+  </ItemGroup>
+
+  <!--Need cleaner way to set this-->
+  <Choose>
+    <When Condition="$(MteRoot) == ''">
+      <PropertyGroup>
+        <!--<MteRoot>$([System.IO.Path]::GetFullPath('..\..\MTE.Tasks\bin\Debug\net462'))</MteRoot>-->
+        <MteRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\..\MTE.Tasks\bin\Debug\net462'))</MteRoot>
+        <!--<MteRoot>$(MSBuildProjectDirectory)..\..\..\MTE.Tasks\bin\Debug\net462</MteRoot>-->
+        
+      </PropertyGroup>
+    </When>
+  </Choose>
+
+  
+  
+  <UsingTask TaskName="TemplateTask" AssemblyFile="$(MteRoot)\MTE.Tasks.dll" />
+  <Target Name="DoMteTemplate" BeforeTargets="CoreCompile">
+    <Message Text="MTE Root $(MteRoot) $(ProjectDir)" />
+    <Message Text="Before Task @(Compile)" />
+    <TemplateTask InputFiles="@(Compile)">
+      <Output ItemName="RemoveItems" TaskParameter="RemoveItems" />
+      <Output ItemName="NewItems" TaskParameter="NewItems" />
+    </TemplateTask>
+    <ItemGroup>
+      <Compile Remove="@(RemoveItems)" />
+      <Compile Include="@(NewItems)" />
+    </ItemGroup>
+    <Message Text="Removed Items @(RemoveItems)" />
+    <Message Text="New Items @(NewItems)" />
+    <Message Text="Compile Items @(Compile)" />
+  </Target>
+</Project>

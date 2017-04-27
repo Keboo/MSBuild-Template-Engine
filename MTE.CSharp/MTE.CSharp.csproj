@@ -1,7 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.4</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Framework" Version="15.1.1012" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="2.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="2.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Features" Version="2.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Features" Version="2.1.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="2.1.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="1.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MTE.Core\MTE.Core.csproj" />
+  </ItemGroup>
 
 </Project>
