@@ -3,6 +3,7 @@
   <PropertyGroup>
     <EnableDefaultCompileItems>False</EnableDefaultCompileItems>
     <MteRoot />
+    <SkipMteTemplate />
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,10 +29,10 @@
   
   
   <UsingTask TaskName="TemplateTask" AssemblyFile="$(MteRoot)\MTE.Tasks.dll" />
-  <Target Name="DoMteTemplate" BeforeTargets="CoreCompile">
+  <Target Name="DoMteTemplate" BeforeTargets="CoreCompile" Condition="$(SkipMteTemplate) == ''">
     <Message Text="MTE Root $(MteRoot) $(ProjectDir)" />
     <Message Text="Before Task @(Compile)" />
-    <TemplateTask InputFiles="@(Compile)">
+    <TemplateTask InputFiles="@(Compile)" ProjectPath="$(ProjectPath)">
       <Output ItemName="RemoveItems" TaskParameter="RemoveItems" />
       <Output ItemName="NewItems" TaskParameter="NewItems" />
     </TemplateTask>

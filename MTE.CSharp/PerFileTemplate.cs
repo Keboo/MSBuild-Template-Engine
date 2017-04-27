@@ -1,4 +1,5 @@
-﻿using Microsoft.Build.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Build.Framework;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using MTE.Core;
@@ -12,13 +13,35 @@ namespace MTE.CSharp
     {
         public virtual bool Execute(Config config)
         {
-            bool rv = true;
-            foreach (ITaskItem item in config.InputItems)
+            var workspace = MSBuildWorkspace.Create(new Dictionary<string, string>
             {
-                rv &= ProcessItem(item, config);
-                if (!rv) break;
+                {"SkipMteTemplate", bool.TrueString}
+            });
+            
+            Project project = workspace.OpenProjectAsync(config.ProjectPath).Result;
+            
+            bool rv = true;
+            foreach (Document document in project.Documents)
+            {
+                if (!(rv &= ProcessItem(document, config))) break;
             }
+
+            //foreach (ITaskItem item in config.InputItems)
+            //{
+            //    rv &= ProcessItem(item, config);
+            //    if (!rv) break;
+            //}
             return rv;
+        }
+
+
+        protected virtual bool ProcessItem(Document document, Config config)
+        {
+            SyntaxNode root = document.GetSyntaxRootAsync().Result;
+            SyntaxNode newRoot = Visit(root);
+            newRoot = Formatter.Format(newRoot, newRoot.FullSpan, new AdhocWorkspace());
+            WriteFile(newRoot, document, config);
+            return true;
         }
 
         protected virtual bool ProcessItem(ITaskItem item, Config config)
@@ -30,6 +53,15 @@ namespace MTE.CSharp
             newRoot = Formatter.Format(newRoot, newRoot.FullSpan, MSBuildWorkspace.Create());
             WriteFile(newRoot, item, config);
             return true;
+        }
+
+        protected virtual void WriteFile(SyntaxNode root, Document document, Config config)
+        {
+            string generatedFilePath = config.ReplaceWithGeneratedFile(document.FilePath);
+            using (var sw = new StreamWriter(generatedFilePath))
+            {
+                root.WriteTo(sw);
+            }
         }
 
         protected virtual void WriteFile(SyntaxNode root, ITaskItem originalItem, Config config)

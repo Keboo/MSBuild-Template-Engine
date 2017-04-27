@@ -13,6 +13,9 @@ namespace MTE.Tasks
         public string ProjectDir { get; set; }
 
         [Required]
+        public string ProjectPath { get; set; }
+
+        [Required]
         public ITaskItem[] InputFiles { get; set; }
 
         [Output]
@@ -25,7 +28,7 @@ namespace MTE.Tasks
         {
             bool rv = true;
 
-            var config = new Config(InputFiles);
+            var config = new Config(InputFiles, ProjectPath);
 
             //TODO: Configure list of templates
             string assemblyPath = Path.GetFullPath(
