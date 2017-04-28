@@ -25,4 +25,8 @@
     <ProjectReference Include="..\MTE.Core\MTE.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
 </Project>

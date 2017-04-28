@@ -10,6 +10,8 @@ namespace MTE.Core
     {
         public bool Run(Config config, string assemblyPath)
         {
+            //AssemblyName name = AssemblyName.GetAssemblyName(assemblyPath);
+            //Assembly assembly = Assembly.Load(name);
             Assembly assembly = Assembly.LoadFile(assemblyPath);
             ITemplate template = (ITemplate)assembly.CreateInstance("MteTemplate");
             return template?.Execute(config) ?? false;

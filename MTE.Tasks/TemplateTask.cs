@@ -3,6 +3,8 @@ using MTE.Core;
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace MTE.Tasks
 {
@@ -27,9 +29,11 @@ namespace MTE.Tasks
         public override bool Execute()
         {
             bool rv = true;
-
             var config = new Config(InputFiles, ProjectPath);
-
+            AppDomain.CurrentDomain.AssemblyResolve += (_, e) =>
+            {
+                return AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().FullName == e.Name);
+            };
             //TODO: Configure list of templates
             string assemblyPath = Path.GetFullPath(
                 @"..\..\..\Examples\SimpleLogger\LoggingTemplate.MTE\bin\Debug\net462\LoggingTemplate.MTE.dll");
@@ -51,9 +55,14 @@ namespace MTE.Tasks
                 ConfigurationFile = $"{assemblyPath}.config",
                 TargetFrameworkName = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName
             };
-            var domain = AppDomain.CreateDomain("OtherDomain", AppDomain.CurrentDomain.Evidence, setup);
-            var runner = (Runner) domain.CreateInstanceAndUnwrap("MTE.Core", typeof(Runner).FullName);
+            Log.LogMessage($"Creating app domain in: {setup.ApplicationBase}");
+            Log.LogMessage(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
+            Log.LogMessage(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
+            var domain = AppDomain.CreateDomain("OtherDomain", null, setup);
+
+            var runner = (Runner)domain.CreateInstanceAndUnwrap(typeof(Runner).Assembly.FullName, typeof(Runner).FullName);
             bool rv = runner.Run(config, assemblyPath);
+
             AppDomain.Unload(domain);
             return rv;
         }
