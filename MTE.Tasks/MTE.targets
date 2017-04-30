@@ -1,33 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project>
   <PropertyGroup>
-    <EnableDefaultCompileItems>False</EnableDefaultCompileItems>
     <MteRoot />
     <SkipMteTemplate />
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="*.cs" Exclude="*.g.cs" />
-    <Compile Include="*.g.cs">
-      <DependentUpon>$([System.String]::Copy('%(Compile.Filename)').Replace('.g', '')).cs</DependentUpon>
+    <Compile Remove="*.g.cs" />
+    <None Include="*.g.cs">
+      <DependentUpon>$([System.String]::Copy('%(None.Filename)').Replace('.g', '')).cs</DependentUpon>
       <IsGenerated>True</IsGenerated>
-    </Compile>
+    </None>
   </ItemGroup>
 
   <!--Need cleaner way to set this-->
   <Choose>
     <When Condition="$(MteRoot) == ''">
       <PropertyGroup>
-        <!--<MteRoot>$([System.IO.Path]::GetFullPath('..\..\MTE.Tasks\bin\Debug\net462'))</MteRoot>-->
         <MteRoot>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\..\MTE.Tasks\bin\Debug\net462'))</MteRoot>
-        <!--<MteRoot>$(MSBuildProjectDirectory)..\..\..\MTE.Tasks\bin\Debug\net462</MteRoot>-->
-        
       </PropertyGroup>
     </When>
   </Choose>
 
-  
-  
+
+
   <UsingTask TaskName="TemplateTask" AssemblyFile="$(MteRoot)\MTE.Tasks.dll" />
   <Target Name="DoMteTemplate" BeforeTargets="CoreCompile" Condition="$(SkipMteTemplate) == ''">
     <Message Text="MTE Root $(MteRoot) $(ProjectDir)" />

@@ -1,10 +1,9 @@
 ﻿using Microsoft.Build.Framework;
 using MTE.Core;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
 
 namespace MTE.Tasks
 {
@@ -39,6 +38,11 @@ namespace MTE.Tasks
                 @"..\..\..\Examples\SimpleLogger\LoggingTemplate.MTE\bin\Debug\net462\LoggingTemplate.MTE.dll");
             rv &= RunTemplate(assemblyPath, config);
 
+            foreach (string message in config.LogMessages)
+            {
+                Log.LogMessage(message);
+            }
+
             if (rv)
             {
                 RemoveItems = config.RemoveItems.ToArray();
@@ -55,14 +59,12 @@ namespace MTE.Tasks
                 ConfigurationFile = $"{assemblyPath}.config",
                 TargetFrameworkName = AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName
             };
-            Log.LogMessage($"Creating app domain in: {setup.ApplicationBase}");
-            Log.LogMessage(AppDomain.CurrentDomain.SetupInformation.ApplicationBase);
-            Log.LogMessage(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
-            var domain = AppDomain.CreateDomain("OtherDomain", null, setup);
-
+            Log.LogMessage($"Creating app domain for: {assemblyPath}");
+            var domain = AppDomain.CreateDomain(Path.GetFileNameWithoutExtension(assemblyPath) + "MteDomain", null, setup);
+            
             var runner = (Runner)domain.CreateInstanceAndUnwrap(typeof(Runner).Assembly.FullName, typeof(Runner).FullName);
             bool rv = runner.Run(config, assemblyPath);
-
+            Log.LogMessage($"Success? {rv} {config.LogMessages.Count}");
             AppDomain.Unload(domain);
             return rv;
         }

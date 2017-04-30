@@ -14,6 +14,7 @@ namespace MTE.CSharp
             bool rv = true;
             foreach (ITaskItem item in config.InputItems)
             {
+                config.LogMessage($"Processing: {item}");
                 rv &= ProcessItem(item, config);
                 if (!rv) break;
             }

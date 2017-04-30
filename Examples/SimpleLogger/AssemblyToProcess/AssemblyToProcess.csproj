@@ -5,8 +5,4 @@
   </PropertyGroup>
 
   <Import Project="..\..\..\MTE.Tasks\MTE.targets" />
-
-  <ItemGroup>
-    <Compile Remove="Class1.g.cs" />
-  </ItemGroup>
 </Project>

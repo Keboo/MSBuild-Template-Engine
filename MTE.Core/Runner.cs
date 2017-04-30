@@ -10,11 +10,24 @@ namespace MTE.Core
     {
         public bool Run(Config config, string assemblyPath)
         {
-            //AssemblyName name = AssemblyName.GetAssemblyName(assemblyPath);
-            //Assembly assembly = Assembly.Load(name);
             Assembly assembly = Assembly.LoadFile(assemblyPath);
+            config.LogMessage($"Loaded {assemblyPath}");
             ITemplate template = (ITemplate)assembly.CreateInstance("MteTemplate");
-            return template?.Execute(config) ?? false;
+            try
+            {
+                if (template != null)
+                {
+                    config.LogMessage($"Found template {template.GetType().FullName}");
+                    return template.Execute(config);
+                }
+                config.LogMessage($"Could not find 'MteTemplate' in {assemblyPath}");
+                return false;
+            }
+            catch (Exception e)
+            {
+                config.LogMessage($"Exception in Template {assemblyPath}\r\n{e}");
+                return false;
+            }
         }
     }
 }
