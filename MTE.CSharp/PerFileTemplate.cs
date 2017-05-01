@@ -9,14 +9,17 @@ namespace MTE.CSharp
 {
     public abstract class PerFileTemplate : CSharpSyntaxRewriter, ITemplate
     {
-        public virtual bool Execute(Config config)
+        public virtual TemplateResult Execute(Config config)
         {
-            bool rv = true;
+            var rv = new TemplateResult();
             foreach (ITaskItem item in config.InputItems)
             {
-                config.LogMessage($"Processing: {item}");
-                rv &= ProcessItem(item, config);
-                if (!rv) break;
+                rv.Log($"Processing: {item}");
+                if (!ProcessItem(item, config))
+                {
+                    rv.Failed($"Failed on {item}");
+                    break;
+                }
             }
             return rv;
         }

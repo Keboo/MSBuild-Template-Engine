@@ -21,9 +21,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SimpleLogger", "SimpleLogger", "{6736DDA4-7D98-498E-A70C-0864788A1822}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoggingTemplate.MTE", "Examples\SimpleLogger\LoggingTemplate.MTE\LoggingTemplate.MTE.csproj", "{738EA010-1F55-4F0C-9123-2DD6DA7C11F4}"
-	ProjectSection(ProjectDependencies) = postProject
-		{89095E5F-D72D-4697-AE76-44DD3623F8F6} = {89095E5F-D72D-4697-AE76-44DD3623F8F6}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyToProcess", "Examples\SimpleLogger\AssemblyToProcess\AssemblyToProcess.csproj", "{D1F808AC-B114-45C3-B004-28F06029B284}"
 EndProject

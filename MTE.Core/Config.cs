@@ -17,10 +17,8 @@ namespace MTE.Core
         public string ProjectPath { get; }
         public ITaskItem[] InputItems { get; }
 
-        public IList<ITaskItem> RemoveItems { get; } = new List<ITaskItem>();
-        public IList<ITaskItem> AddItems { get; } = new List<ITaskItem>();
-
-        public IList<string> LogMessages { get; } = new List<string>();
+        private IList<ITaskItem> RemoveItems { get; } = new List<ITaskItem>();
+        private IList<ITaskItem> AddItems { get; } = new List<ITaskItem>();
 
         internal Config(ITaskItem[] inputItems, string projectPath)
         {
@@ -70,11 +68,6 @@ namespace MTE.Core
             AddItems.Add(newItem);
 
             return generatedFile;
-        }
-
-        public void LogMessage(string message)
-        {
-            LogMessages.Add(message);
         }
     }
 }
