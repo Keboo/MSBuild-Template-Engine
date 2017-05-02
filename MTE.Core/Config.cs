@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 namespace MTE.Core
 {
     [Serializable]
-    public class Config
+    public class Config : MarshalByRefObject
     {
         public string ProjectPath { get; }
         public ITaskItem[] InputItems { get; }

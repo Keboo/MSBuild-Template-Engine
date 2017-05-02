@@ -1,4 +1,5 @@
-﻿using Microsoft.Build.Framework;
+﻿using System;
+using Microsoft.Build.Framework;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Formatting;
@@ -10,11 +11,19 @@ namespace MTE.CSharp
 {
     public abstract class PerFileTemplate : CSharpSyntaxRewriter, ITemplate
     {
+        protected bool IncludeTempFiles { get; set; }
+
         public virtual TemplateResult Execute(Config config)
         {
             var rv = new TemplateResult();
             foreach (ITaskItem item in config.InputItems)
             {
+                if (!IncludeTempFiles && IsTempFile(item))
+                {
+                    rv.Log($"Skipping generated item {item}");
+                    continue;
+                }
+
                 rv.Log($"Processing: {item}");
                 if (!ProcessItem(item, config, rv))
                 {
@@ -42,11 +51,21 @@ namespace MTE.CSharp
             string filePath = originalItem.GetMetadata("FullPath");
             string generatedFile = Path.Combine(Path.GetDirectoryName(filePath),
                         $"{Path.GetFileNameWithoutExtension(filePath)}.g{Path.GetExtension(filePath)}");
-            result.AddItem(new TaskItem(generatedFile));
+            result.AddItem(new NewItem(generatedFile));
             using (var sw = new StreamWriter(generatedFile))
             {
                 root.WriteTo(sw);
             }
+        }
+
+        private static bool IsTempFile(ITaskItem item)
+        {
+            var fullPath = item.GetMetadata("FullPath");
+            if (Path.GetFileName(fullPath)?.StartsWith("TemporaryGeneratedFile") == true)
+                return true;
+            if (Path.IsPathRooted(fullPath) && fullPath.StartsWith(Path.GetTempPath()))
+                return true;
+            return false;
         }
     }
 }

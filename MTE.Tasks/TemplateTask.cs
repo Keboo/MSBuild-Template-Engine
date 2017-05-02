@@ -1,13 +1,13 @@
 ﻿using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 using MTE.Core;
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace MTE.Tasks
 {
-    public class TemplateTask : Microsoft.Build.Utilities.Task, ICancelableTask
+    public class TemplateTask : Task, ICancelableTask
     {
         public string SolutionDir { get; set; }
 
@@ -24,11 +24,6 @@ namespace MTE.Tasks
 
         [Output]
         public ITaskItem[] NewItems { get; set; }
-
-        public TemplateTask()
-        {
-            
-        }
 
         public override bool Execute()
         {
@@ -52,15 +47,11 @@ namespace MTE.Tasks
                 @"..\..\..\Examples\SimpleLogger\LoggingTemplate.MTE\bin\Debug\net462\LoggingTemplate.MTE.dll");
             rv &= RunTemplate(assemblyPath, config);
             
-            if (rv)
-            {
-                //RemoveItems = config.RemoveItems.ToArray();
-                //NewItems = config.AddItems.ToArray();
-            }
-            return rv;
+            Log.LogMessage($"Result {rv}");
+            return true;
         }
 
-        private TemplateResult RunTemplate(string assemblyPath, Config config)
+        private bool RunTemplate(string assemblyPath, Config config)
         {
             AppDomain domain = null;
             try
@@ -69,8 +60,7 @@ namespace MTE.Tasks
                 {
                     ApplicationBase = Path.GetDirectoryName(typeof(Runner).Assembly.Location),
                     ConfigurationFile = $"{assemblyPath}.config",
-                    LoaderOptimization = LoaderOptimization.MultiDomain,
-                    DisallowBindingRedirects = 
+                    LoaderOptimization = LoaderOptimization.MultiDomain 
                 };
                 Log.LogMessage($"Creating app domain for: {assemblyPath}");
                 domain = AppDomain.CreateDomain(Path.GetFileNameWithoutExtension(assemblyPath) + "MteDomain", null,
@@ -90,7 +80,12 @@ namespace MTE.Tasks
                 {
                     Log.LogMessage($" ==> {message}");
                 }
-                return result.Success;
+                if (result.Success)
+                {
+                    RemoveItems = result.RemovedItems.ToArray();
+                    NewItems = result.AddedItems.Select(x => new TaskItem(x.FilePath)).Cast<ITaskItem>().ToArray();
+                }
+                return true;
             }
             finally
             {
