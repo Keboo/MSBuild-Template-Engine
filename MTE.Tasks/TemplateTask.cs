@@ -60,7 +60,7 @@ namespace MTE.Tasks
             return rv;
         }
 
-        private bool RunTemplate(string assemblyPath, Config config)
+        private TemplateResult RunTemplate(string assemblyPath, Config config)
         {
             AppDomain domain = null;
             try
@@ -70,6 +70,7 @@ namespace MTE.Tasks
                     ApplicationBase = Path.GetDirectoryName(typeof(Runner).Assembly.Location),
                     ConfigurationFile = $"{assemblyPath}.config",
                     LoaderOptimization = LoaderOptimization.MultiDomain,
+                    DisallowBindingRedirects = 
                 };
                 Log.LogMessage($"Creating app domain for: {assemblyPath}");
                 domain = AppDomain.CreateDomain(Path.GetFileNameWithoutExtension(assemblyPath) + "MteDomain", null,

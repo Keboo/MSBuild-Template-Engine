@@ -1,17 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Build.Framework;
 
 namespace MTE.Core
 {
     [Serializable]
     public sealed class TemplateResult : MarshalByRefObject
     {
-        public bool Success = true;
+        public bool Success { get; private set; } = true;
 
         private readonly List<string> _messages = new List<string>();
         public IReadOnlyList<string> Messages => _messages;
 
-        //public string Messages;
+        private readonly List<ITaskItem> _addedItems = new List<ITaskItem>();
+        public IReadOnlyList<ITaskItem> AddedItem => _addedItems;
+
+        private readonly List<ITaskItem> _removedItems = new List<ITaskItem>();
+        public IReadOnlyList<ITaskItem> RemovedItems => _removedItems;
+
 
         public void Failed(string message = null)
         {
@@ -25,6 +31,16 @@ namespace MTE.Core
         public void Log(string message)
         {
             _messages.Add(message);
+        }
+
+        public void AddItem(ITaskItem item)
+        {
+            _addedItems.Add(item);
+        }
+
+        public void RemoveItem(ITaskItem item)
+        {
+            _removedItems.Add(item);
         }
     }
 }
